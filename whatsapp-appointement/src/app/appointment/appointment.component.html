@@ -1,0 +1,22 @@
+<div class="form-container">
+  <h2>📅 Book Your Appointment</h2>
+
+  <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" formControlName="name" required />
+    </div>
+
+    <div class="form-group">
+      <label for="number">WhatsApp Number</label>
+      <input type="tel" id="number" formControlName="number" required placeholder="e.g. 9876543210" />
+    </div>
+
+    <div class="form-group">
+      <label for="datetime">Preferred Date & Time</label>
+      <input type="datetime-local" id="datetime" formControlName="datetime" required />
+    </div>
+
+    <button type="submit">Confirm Appointment</button>
+  </form>
+</div>
