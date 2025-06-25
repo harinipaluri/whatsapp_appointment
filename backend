@@ -1,0 +1,59 @@
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+
+const app = express();
+const port = 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+
+const accountSid = 'ACdd61bcd0cb098cf2864135d06c394879';
+const authToken = '0553879351f352202b9066d586bdc857';
+const client = require('twilio')(accountSid, authToken);
+
+app.post('/book', (req, res) => {
+  const { name, number, datetime } = req.body;
+
+  // ✅ Attractive WhatsApp confirmation message
+  const message = `👋 Hi ${name}!
+
+✅ Your appointment with *Dr. Avani Reddy* has been *confirmed* for:
+
+📅 *${datetime}*
+
+📍 Location: HealthCare Clinic, Hyderabad  
+📝 Please arrive 10 minutes early.
+
+💬 If you need to reschedule, just reply to this message.
+
+Thank you!  
+– Team HealthCare 💚`;
+
+
+  client.messages
+    .create({
+      from: 'whatsapp:+14155238886',
+      to: `whatsapp:+91${number}`,
+      body: message
+    })
+    .then(() => {
+      const booking = { name, number, datetime };
+      const data = fs.existsSync('bookings.json')
+        ? JSON.parse(fs.readFileSync('bookings.json'))
+        : [];
+      data.push(booking);
+      fs.writeFileSync('bookings.json', JSON.stringify(data, null, 2));
+
+      res.send({ success: true });
+    })
+    .catch(err => {
+      console.error('Error sending WhatsApp:', err);
+      res.status(500).send({ error: 'WhatsApp failed' });
+    });
+});
+
+app.listen(port, () => {
+  console.log(`✅ Server running at http://localhost:${port}`);
+});
